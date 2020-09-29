@@ -62,6 +62,7 @@ int enter_numbers() {
     }
     if (rght_brdr > M_PI)
         return 2;
+    return 0;
 }
 
 int main() {

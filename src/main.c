@@ -2,6 +2,8 @@
 #include <math.h>
 #include <string.h>
 
+#define error(...) (fprintf(stderr, __VA_ARGS__))
+
 double lft_brdr, rght_brdr;
 char answer[4][25];
 
@@ -16,12 +18,12 @@ double meth_rect(int N) {
     return intgrl;
 }
 
-double meth_simp(int N) {
+double meth_simp(int parts_count) {
     double x_cord, h_cord, intgrl;
-    h_cord = (rght_brdr - lft_brdr) / 2 / N;
+    h_cord = (rght_brdr - lft_brdr) / 2 / parts_count;
     intgrl = sin(lft_brdr) + sin(rght_brdr);
     x_cord = lft_brdr + h_cord;
-    for (int answr = 1; answr < 2 * N; answr++) {
+    for (int answr = 1; answr < 2 * parts_count; answr++) {
         if (answr % 2 == 0) intgrl += 2 * sin(x_cord);
         else intgrl += 4 * sin(x_cord);
         x_cord += h_cord;
@@ -30,20 +32,20 @@ double meth_simp(int N) {
     return intgrl;
 }
 
-void call(int a[6]) {
+void calcul_intgrl(int *a, int segments_length) {
     char middle_line[15];
-    for (int answr = 0; answr < 6; answr++) {
+    for (int i = 0; i < segments_length; i++) {
         double intgrl_rect, intgrl_simp;
-        intgrl_rect = meth_rect(a[answr]);
-        intgrl_simp = meth_simp(a[answr]);
-        sprintf(middle_line, "%d", a[answr]);
-        strcat(answer[answr], middle_line);
-        strcat(answer[answr], " ");
+        intgrl_rect = meth_rect(a[i]);
+        intgrl_simp = meth_simp(a[i]);
+        sprintf(middle_line, "%d", a[i]);
+        strcat(answer[i], middle_line);
+        strcat(answer[i], " ");
         sprintf(middle_line, "%2.5f", intgrl_rect);
-        strcat(answer[answr], middle_line);
-        strcat(answer[answr], " ");
+        strcat(answer[i], middle_line);
+        strcat(answer[i], " ");
         sprintf(middle_line, "%2.5f", intgrl_simp);
-        strcat(answer[answr], middle_line);
+        strcat(answer[i], middle_line);
     }
 }
 
@@ -53,32 +55,35 @@ int enter_numbers() {
         printf("Error! Enter again: ");
         while (getchar() != '\n');
     }
-    if (lft_brdr < 0)
-        return 1;
+    if (lft_brdr < 0) {
+        error("Error. Left border should be bigger than 0.");
+        return -1;
+    }
     printf("Enter interval's right border: ");
     while (!(scanf("%lf", &rght_brdr))) {
         printf("Error! Enter again: ");
         while (getchar() != '\n');
     }
-    if (rght_brdr > M_PI)
-        return 2;
+    if (rght_brdr < lft_brdr) {
+        error("Error. Right border should be bigger than left border.");
+        return -1;
+    }
+    if (rght_brdr > M_PI) {
+        error("Error. Right border should be less than PI.");
+        return -1;
+    }
     return 0;
 }
 
 int main() {
     int segments[] = {6, 10, 20, 100, 500, 1000};
-    int errors = enter_numbers();
-    if (errors == 1) {
-        printf("Error left border. ErrorId: 1.");
-        return 1;
+    if (enter_numbers()) {
+        return -1;
     }
-    if (errors == 2) {
-        printf("Error right border. ErrorId: 2.");
-        return 2;
-    }
-    call(segments);
-    for (int answr = 0; answr < 6; answr++) {
-        printf("%s\n", answer[answr]);
+    int const segments_length = sizeof(segments) / sizeof(int);
+    calcul_intgrl(segments, segments_length);
+    for (int i = 0; i < segments_length; i++) {
+        printf("%s\n", answer[i]);
     }
     return 0;
 }

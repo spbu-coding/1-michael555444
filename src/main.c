@@ -7,11 +7,11 @@
 double lft_brdr, rght_brdr;
 char answer[4][25];
 
-double meth_rect(int N) {
+double meth_rect(int NOIP) {        //NOIP - nomber of integral parts
     double x_cord, h_cord, intgrl = 0;
-    h_cord = (rght_brdr - lft_brdr) / N;
+    h_cord = (rght_brdr - lft_brdr) / NOIP;
     x_cord = lft_brdr;
-    for (int answr = 0; answr < N; answr++) {
+    for (int answr = 0; answr < NOIP; answr++) {
         intgrl += sin(x_cord + h_cord / 2) * h_cord;
         x_cord += h_cord;
     }
